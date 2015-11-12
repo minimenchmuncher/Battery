@@ -72,8 +72,13 @@ battery_charge() {
             if [ -d $battery_path ]; then
                 batt_num=$(basename "$battery_path")
             else
-                batt_num=$(ls /sys/class/power_supply | grep "BAT")
-                battery_path=/sys/class/power_supply/$batt_num
+                if [ $(ls /sys/class/power_supply/ | grep "BAT" | wc -l) -ge 1 ]; then
+                    batt_num=$(ls /sys/class/power_supply | grep "BAT")
+                    battery_path=/sys/class/power_supply/$batt_num
+                else
+                    >&2 echo "Battery path provided is invalid. Try using /sys/class/power_supply/..."
+                    exit 1
+                fi
             fi
 
             if ((program_on)) && hash upower 2>/dev/null; then
@@ -85,6 +90,9 @@ battery_charge() {
                 fi
                 BATT_PCT=$(upower -i $(upower -e | grep "$batt_num") | grep "percentage" | grep -o '[0-9]*%' | tr -d '%')
             else
+                if [[ ! -f $battery_path/capacity || ! -f $battery_path/status ]]; then
+                    battery_path=/sys/class/power_supply/$batt_num
+                fi
                 BATT_PCT=$(cat $battery_path/capacity)
                 battery_state=$(cat $battery_path/status)
                 if [ $battery_state == 'Discharging' ]; then
