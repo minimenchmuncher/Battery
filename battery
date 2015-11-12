@@ -83,7 +83,7 @@ battery_charge() {
                 else
                     BATT_CONNECTED=1
                 fi
-                BATT_PCT=$(upower -i $(upower -e | grep BAT) | grep "percentage" | grep -o '[0-9]*%' | tr -d '%')
+                BATT_PCT=$(upower -i $(upower -e | grep "$batt_num") | grep "percentage" | grep -o '[0-9]*%' | tr -d '%')
             else
                 BATT_PCT=$(cat $battery_path/capacity)
                 battery_state=$(cat $battery_path/status)
