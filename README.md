@@ -2,19 +2,22 @@
 
 ![image](http://i.imgur.com/mEEPD.png)
 
-Battery is a little bash script that uses [Spark](https://github.com/holman/spark) to display the battery status on your __tmux__ sessions or the __terminal__.
+Battery is a little bash script that can use [Spark](https://github.com/holman/spark) to display the battery status on your __tmux__ sessions or the __terminal__.
 
 ### Features
 
 * Changes color to reflect battery status (Green, Yellow, Red)
 * Displays battery percentage
-* Graph bar changes its values between 0 and 100% (thanks to spark)
+* Graph bar changes its values between 0 and 100%
 * If you don't like the default colors, you can specify the good, medium and warning battery status colors using flags (read usage).
 
 ### Requirements
 
-Right now, battery requires [Spark](https://github.com/holman/spark) to graph your battery status.
-Battery can run on both __Mac OS X__ and Linux.
+There are no external requirements to use __Battery__; however, there are a number of programs that interface well with __Battery__
+
+[Spark](https://github.com/holman/spark) is used by default, if it is installed and in your path.
+
+If you are using a Linux laptop, __Battery__ may use `upower`, which is included with many Linux distributions.
 
 If you don't want to use Spark, you can use the `-a` flag, for ascii output:
 ![image](http://i.imgur.com/w9qtQeu.png)
@@ -47,13 +50,13 @@ Just do (case sensitive)
 
 	``` sudo chmod 755 /usr/bin/battery ```
 
+
 # Install - Linux
 
-Linux support is still being tested. It ought to work properly in Debian and
-Ubuntu, but is largely untested in other distributions. Using linux requires
-`upower`, which should be included, or available, on most linux distributions.
+Linux support is still being tested. It is recommended, but not necessary,
+to have `upower` installed on your machine.
 
-It's recommended to install this somewhere in your path that is writable,
+It is recommended to install this somewhere in your path that is writable,
 like `/usr/local/bin`
 
 ```bash
@@ -100,8 +103,20 @@ large-scale data processing.
 ###### You should now see something like this at the bottom right corner:
 ![image](http://i.imgur.com/Eaajb.png)
 
-# Flags
+### Flags
+`-t` if you are using `battery` in a `tmux` status bar.
+`-a` for ascii output. `battery` reverts to this setting if `spark` is not found.
+`-p` for alternative program. On Mac this uses `pmset`, and on Linux switches to using `upower`, if present. Both give more accurate percentages.
+`-b` for alternative battery path (ignored on Mac)
 
-The flag `-b` will set a different battery path, the default value is `/sys/class/power_supply/BAT0`. You can specifiy the colors for __good__ battery level, __middle__ battery level, and __warning__ battery level with the flags ``` -g -m -w ```.
+The flag `-b` will set a different battery path, the default value is `/sys/class/power_supply/BAT0`. Use this flag for specifying an alternative path
+other than `BAT0` (this may be necessary if running Linux in a VM) or for specifying the path to a secondary battery. A sample usage in tmux is
+
+```
+set -g status-right "#([ -d /sys/class/power_supply/BAT1 ] && /path/to/battery -t -b /sys/class/power_supply/BAT1) #(/path/to/battery -t)"
+```
+
+This will show the battery indicator only if BAT1 is present.
+
+You can specifiy the colors for __good__ battery level, __middle__ battery level, and __warning__ battery level with the flags ``` -g -m -w ```.
 __Note:__ You should use color names for when in tmux mode and [ascii colors](http://www.termsys.demon.co.uk/vtansi.htm#colors) in terminal mode.
-In Mac OS, you can specify to use pmset with the `-p` flag; without it, the program uses `ioreg`. In linux, this flag is ignored, and always uses `upower`.
